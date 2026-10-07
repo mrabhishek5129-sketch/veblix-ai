@@ -1,0 +1,65 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  mobile        String?        @unique
+  password      String
+  credits       Int            @default(100)
+  role          String         @default("USER")
+  otp           String?
+  otpExpiry     DateTime?
+  otpTarget     String?        // email or mobile that OTP was sent to
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  projects      Project[]
+  transactions  Transaction[]
+}
+
+model Project {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions    ProjectVersion[]
+  messages    ChatMessage[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ProjectVersion {
+  id            String    @id @default(cuid())
+  versionNumber Int
+  prompt        String
+  filesJson     String    // Serialized JSON map of { filePath: fileContent }
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String   // 'user' | 'assistant' | 'system'
+  content   String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // e.g. +100, -20 (Generation), -5 (Chat Edit), +500 (Refill)
+  type      String   // 'SIGNUP_BONUS' | 'GENERATE' | 'EDIT' | 'PURCHASE'
+  createdAt DateTime @default(now())
+}
