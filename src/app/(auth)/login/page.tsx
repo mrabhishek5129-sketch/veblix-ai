@@ -157,7 +157,7 @@ export default function LoginPage() {
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <span className="font-bold text-xl text-white tracking-tight">
-          AI Website Builder
+          Veblix AI
         </span>
       </Link>
 

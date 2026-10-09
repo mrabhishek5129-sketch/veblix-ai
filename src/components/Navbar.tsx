@@ -19,7 +19,7 @@ export default function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm md:text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-purple-300">
-                AI Website Builder
+                Veblix AI
               </span>
               <span className="hidden md:block text-[10px] text-purple-400 font-medium tracking-wider uppercase -mt-1">
                 Prompt to App

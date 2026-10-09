@@ -67,7 +67,7 @@ self.addEventListener("fetch", (event) => {
               `<!DOCTYPE html>
               <html lang="en">
               <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-              <title>AI Website Builder — Offline</title>
+              <title>Veblix AI — Offline</title>
               <style>
                 body{margin:0;background:#090a0f;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;}
                 .icon{font-size:64px;margin-bottom:16px;}
@@ -78,7 +78,7 @@ self.addEventListener("fetch", (event) => {
               <body>
                 <div>
                   <div class="icon">✨</div>
-                  <h1>AI Website Builder</h1>
+                  <h1>Veblix AI</h1>
                   <p>Aap offline hain. Internet connect karo.</p>
                   <button onclick="location.reload()">Retry karo</button>
                 </div>

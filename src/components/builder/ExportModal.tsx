@@ -33,7 +33,7 @@ export default function ExportModal({
       // 2. Add README.md
       const readmeContent = `# ${projectTitle}
 
-This website was built using **AI Website Builder**.
+This website was built using **Veblix AI**.
 
 ## 🚀 How to Run Locally
 
@@ -49,7 +49,7 @@ Simply double-click \`index.html\` to open the website in your favorite web brow
 2. Link the repository on [Vercel](https://vercel.com) or [Netlify](https://netlify.com) for 1-click free deployment!
 
 ---
-© 2026 ${projectTitle}. Powered by AI Website Builder.
+© 2026 ${projectTitle}. Powered by Veblix AI.
 `;
       zip.file("README.md", readmeContent);
 

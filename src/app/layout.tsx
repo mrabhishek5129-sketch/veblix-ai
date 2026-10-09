@@ -12,7 +12,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "AI Website Builder | Prompt to App",
+  title: "Veblix AI | Prompt to App",
   description:
     "Sirf ek prompt se poora website banao — AI powered website generator with live preview.",
   manifest: "/manifest.json",
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "AI Website Builder",
+    title: "Veblix AI",
     description: "Prompt se website banao instantly",
-    siteName: "AI Website Builder",
+    siteName: "Veblix AI",
   },
   icons: {
     icon: "/icons/icon-192x192.svg",
@@ -46,7 +46,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <head>
         {/* PWA Meta Tags */}
-        <meta name="application-name" content="AI Website Builder" />
+        <meta name="application-name" content="Veblix AI" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="AIWebBuilder" />

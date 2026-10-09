@@ -11,7 +11,7 @@ export default function Footer() {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-white tracking-tight">
-              AI Website Builder
+              Veblix AI
             </span>
           </div>
 

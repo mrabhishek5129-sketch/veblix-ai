@@ -11,9 +11,9 @@ const transporter = nodemailer.createTransport({
 
 export async function sendOTPEmail(to: string, otp: string, name?: string) {
   const mailOptions = {
-    from: `"AI Website Builder" <${process.env.GMAIL_USER}>`,
+    from: `"Veblix AI" <${process.env.GMAIL_USER}>`,
     to,
-    subject: "🔐 Your Password Reset OTP - AI Website Builder",
+    subject: "🔐 Your Password Reset OTP - Veblix AI",
     html: `
       <!DOCTYPE html>
       <html>
@@ -22,7 +22,7 @@ export async function sendOTPEmail(to: string, otp: string, name?: string) {
           <!-- Header -->
           <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:32px 32px 24px;text-align:center;">
             <div style="font-size:32px;margin-bottom:8px;">✨</div>
-            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">AI Website Builder</h1>
+            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700;">Veblix AI</h1>
             <p style="color:#c4b5fd;margin:4px 0 0;font-size:13px;">Password Reset Request</p>
           </div>
 
@@ -52,7 +52,7 @@ export async function sendOTPEmail(to: string, otp: string, name?: string) {
           <!-- Footer -->
           <div style="background:#0f172a;padding:16px 32px;text-align:center;border-top:1px solid #1f2937;">
             <p style="color:#4b5563;font-size:11px;margin:0;">
-              AI Website Builder • Made with ❤️ by Abhishek
+              Veblix AI • Made with ❤️ by Abhishek
             </p>
           </div>
         </div>
