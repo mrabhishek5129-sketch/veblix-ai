@@ -1,6 +1,6 @@
 {
   "name": "Veblix AI",
-  "short_name": "AIWebBuilder",
+  "short_name": "Veblix AI",
   "description": "Prompt se poora website banao — AI powered",
   "start_url": "/dashboard",
   "display": "standalone",

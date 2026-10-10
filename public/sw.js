@@ -1,4 +1,4 @@
-const CACHE_NAME = "ai-web-builder-v1";
+const CACHE_NAME = "Veblix AI";
 const STATIC_CACHE = "static-v1";
 
 const STATIC_ASSETS = [
