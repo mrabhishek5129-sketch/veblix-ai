@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { History, RotateCcw, Clock } from "lucide-react";
+import { History, RotateCcw, Clock, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Project {
@@ -16,12 +16,44 @@ export default function HistoryPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchProjects = () => {
     fetch("/api/projects")
       .then((r) => r.json())
       .then((d) => setProjects(d.projects || []))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchProjects();
   }, []);
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Kya aap "${title}" aur iski saari history delete karna chahte hain?`)) return;
+    try {
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert("Delete failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Delete error", err);
+    }
+  };
+
+  const handleClearAllHistory = async () => {
+    if (!confirm("Kya aap saare projects ki poori history delete karna chahte hain?")) return;
+    try {
+      const res = await fetch("/api/history", { method: "DELETE" });
+      if (res.ok) {
+        setProjects([]);
+      } else {
+        alert("Failed to clear history.");
+      }
+    } catch (err) {
+      console.error("Clear all error", err);
+    }
+  };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-IN", {
@@ -35,13 +67,26 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <History className="w-6 h-6 text-violet-400" /> History
-        </h1>
-        <p className="text-gray-400 text-sm mt-1">
-          Har project ki version history — rollback kar sakte ho
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <History className="w-6 h-6 text-violet-400" /> History
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Har project ki version history — rollback ya delete kar sakte ho
+          </p>
+        </div>
+
+        {projects.length > 0 && (
+          <button
+            onClick={handleClearAllHistory}
+            className="self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 rounded-xl text-xs font-semibold transition-all"
+            title="Clear all history"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear All History</span>
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -72,12 +117,21 @@ export default function HistoryPage() {
                   </div>
                   <span className="text-white font-semibold text-sm">{p.title}</span>
                 </div>
-                <Link
-                  href={`/builder/${p.id}`}
-                  className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
-                >
-                  Open Builder →
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={`/builder/${p.id}`}
+                    className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+                  >
+                    Open Builder →
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(p.id, p.title)}
+                    className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                    title="Delete Project & History"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Versions Timeline */}

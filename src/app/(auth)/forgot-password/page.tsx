@@ -349,13 +349,27 @@ export default function ForgotPasswordPage() {
 
             {/* Demo OTP banner */}
             {demoOtp && (
-              <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
-                <span className="text-base">📱</span>
-                <div>
-                  <p className="font-semibold">Demo Mode — SMS nahi gaya</p>
-                  <p>Aapka OTP hai: <strong className="text-white text-sm font-mono">{demoOtp}</strong></p>
-                  <p className="text-amber-400/70 mt-0.5">Real SMS ke liye Twilio configure karo</p>
+              <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🔐</span>
+                  <div>
+                    <p className="font-semibold text-white">
+                      Aapka OTP: <span className="text-amber-400 font-mono text-sm tracking-wider font-bold">{demoOtp}</span>
+                    </p>
+                    <p className="text-gray-400 text-[11px]">Neeche boxes mein daalein ya button dabayein</p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const digits = demoOtp.split("").slice(0, 6);
+                    setOtpInputs(digits);
+                    setOtp(demoOtp);
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold text-xs border border-amber-500/40 transition-colors flex-shrink-0"
+                >
+                  ⚡ Auto Fill
+                </button>
               </div>
             )}
 

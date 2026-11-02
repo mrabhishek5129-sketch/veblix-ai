@@ -21,6 +21,8 @@ import {
   Zap,
   Loader2,
   AlertCircle,
+  Pencil,
+  Check,
 } from "lucide-react";
 
 interface ProjectVersion {
@@ -66,7 +68,29 @@ function BuilderContent() {
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isDeployOpen, setIsDeployOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
   const [error, setError] = useState("");
+
+  const handleSaveTitle = async () => {
+    if (!editedTitle.trim() || !project) {
+      setIsEditingTitle(false);
+      return;
+    }
+    const clean = editedTitle.trim();
+    setProject((prev) => (prev ? { ...prev, title: clean } : prev));
+    setIsEditingTitle(false);
+
+    try {
+      await fetch(`/api/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: clean }),
+      });
+    } catch (err) {
+      console.error("Save title error", err);
+    }
+  };
 
   const extractCode = (filesJson: string): string => {
     try {
@@ -280,9 +304,46 @@ function BuilderContent() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-sm text-white tracking-tight">
-              {project?.title || "AI Website"}
-            </span>
+            {isEditingTitle ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveTitle();
+                }}
+                className="flex items-center gap-1.5"
+              >
+                <input
+                  type="text"
+                  autoFocus
+                  maxLength={60}
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onBlur={handleSaveTitle}
+                  className="bg-gray-800 text-white text-xs font-semibold rounded-lg px-2 py-1 border border-purple-500 focus:outline-none min-w-[140px] max-w-[220px]"
+                />
+                <button
+                  type="submit"
+                  className="p-1 text-green-400 hover:text-green-300"
+                  title="Save title"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            ) : (
+              <div
+                onClick={() => {
+                  setEditedTitle(project?.title || "");
+                  setIsEditingTitle(true);
+                }}
+                className="flex items-center space-x-1.5 cursor-pointer group/title"
+                title="Click to rename project"
+              >
+                <span className="font-bold text-sm text-white tracking-tight group-hover/title:text-purple-300 transition-colors">
+                  {project?.title || "AI Website"}
+                </span>
+                <Pencil className="w-3 h-3 text-gray-500 group-hover/title:text-purple-400 opacity-60 group-hover/title:opacity-100 transition-all" />
+              </div>
+            )}
             <span className="px-2 py-0.5 rounded-full bg-purple-950/60 border border-purple-500/30 text-purple-300 text-[10px] font-bold">
               v{currentVersion}
             </span>

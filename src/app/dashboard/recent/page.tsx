@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, ExternalLink, Pencil } from "lucide-react";
+import { Clock, ExternalLink, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Project {
@@ -28,6 +28,20 @@ export default function RecentPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Kya aap "${title}" ko delete karna chahte hain?`)) return;
+    try {
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert("Delete failed.");
+      }
+    } catch (err) {
+      console.error("Delete error", err);
+    }
+  };
 
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -108,6 +122,13 @@ export default function RecentPage() {
                 >
                   <ExternalLink className="w-4 h-4" />
                 </Link>
+                <button
+                  onClick={() => handleDelete(p.id, p.title)}
+                  className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                  title="Delete project"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}

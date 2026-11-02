@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "AIWebBuilder",
+    title: "Veblix AI",
   },
   formatDetection: {
     telephone: false,
@@ -49,7 +49,7 @@ export default function RootLayout({
         <meta name="application-name" content="Veblix AI" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="AIWebBuilder" />
+        <meta name="apple-mobile-web-app-title" content="Veblix AI" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#7c3aed" />
         <meta name="msapplication-tap-highlight" content="no" />

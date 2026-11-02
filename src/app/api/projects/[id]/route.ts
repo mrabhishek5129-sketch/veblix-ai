@@ -128,6 +128,48 @@ export async function POST(
   }
 }
 
+// PATCH /api/projects/[id] - Rename or update project title/description
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user || !(session.user as any).id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = (session.user as any).id;
+    const projectId = params.id;
+    const { title, description } = await req.json();
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (!project || project.userId !== userId) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    const updated = await prisma.project.update({
+      where: { id: projectId },
+      data: {
+        ...(title ? { title: title.trim() } : {}),
+        ...(description !== undefined ? { description: description.trim() } : {}),
+      },
+    });
+
+    return NextResponse.json({ success: true, project: updated });
+  } catch (error: any) {
+    console.error("Error updating project:", error);
+    return NextResponse.json(
+      { error: "Failed to update project" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/projects/[id]
 export async function DELETE(
   req: Request,
@@ -151,11 +193,13 @@ export async function DELETE(
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    await prisma.project.delete({
-      where: { id: projectId },
-    });
+    await prisma.$transaction([
+      prisma.chatMessage.deleteMany({ where: { projectId } }),
+      prisma.projectVersion.deleteMany({ where: { projectId } }),
+      prisma.project.delete({ where: { id: projectId } }),
+    ]);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: "Project deleted successfully" });
   } catch (error: any) {
     console.error("Error deleting project:", error);
     return NextResponse.json(

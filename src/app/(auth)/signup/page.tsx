@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Lock,
   Mail,
-  Phone,
   User,
   AlertCircle,
   Loader2,
@@ -23,7 +22,6 @@ function SignupForm() {
   const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +40,7 @@ function SignupForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, mobile: mobile || undefined, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
@@ -134,23 +132,6 @@ function SignupForm() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-300 mb-1.5">
-            Mobile Number <span className="text-gray-500">(optional — password reset ke liye)</span>
-          </label>
-          <div className="relative flex items-center">
-            <Phone className="w-4 h-4 text-gray-500 absolute left-3 pointer-events-none" />
-            <span className="absolute left-10 text-gray-400 text-sm border-r border-gray-700 pr-2">+91</span>
-            <input
-              type="tel"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-              placeholder="9876543210"
-              maxLength={10}
-              className="w-full bg-gray-900/60 border border-gray-700/80 rounded-xl pl-20 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
-            />
-          </div>
-        </div>
 
         <div>
           <label className="block text-xs font-medium text-gray-300 mb-1.5">

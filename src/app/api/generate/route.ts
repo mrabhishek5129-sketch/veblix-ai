@@ -45,7 +45,22 @@ export async function POST(req: Request) {
     }
 
     // 3. Generate Code via AI Engine
-    const generated = await generateWebsiteCode(prompt, project.title);
+    const isGenericTitle =
+      !project.title ||
+      project.title === "My AI Website" ||
+      project.title === "New Website" ||
+      project.title === "My Project" ||
+      project.title.toLowerCase().startsWith("untitled");
+
+    const generated = await generateWebsiteCode(
+      prompt,
+      isGenericTitle ? undefined : project.title
+    );
+
+    const smartTitle =
+      isGenericTitle && generated.title && generated.title !== "My AI Website"
+        ? generated.title
+        : project.title;
 
     // 4. Atomic Database Updates (Deduct Credits, Log Transaction, Save Version v1)
     const [updatedUser, newVersion] = await prisma.$transaction([
@@ -74,12 +89,16 @@ export async function POST(req: Request) {
         data: {
           projectId,
           role: "assistant",
-          content: `🎉 I have generated the initial full-stack website for **${project.title}**!\n\n${generated.summary}\n\nYou can now test it live on the right, or ask me to make changes in chat below (e.g. *"change color theme"*, *"add testimonials section"*).`,
+          content: `🎉 I have generated the initial full-stack website for **${smartTitle}**!\n\n${generated.summary}\n\nYou can now test it live on the right, or ask me to make changes in chat below (e.g. *"change color theme"*, *"add testimonials section"*).`,
         },
       }),
       prisma.project.update({
         where: { id: projectId },
-        data: { description: prompt },
+        data: {
+          description: prompt,
+          title: smartTitle,
+          updatedAt: new Date(),
+        },
       }),
     ]);
 

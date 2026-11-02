@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FolderOpen, Download, Code2, Clock, Pencil } from "lucide-react";
+import { FolderOpen, Download, Code2, Clock, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Project {
@@ -23,6 +23,20 @@ export default function FilesPage() {
       .then((d) => setProjects(d.projects || []))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Kya aap "${title}" ko delete karna chahte hain?`)) return;
+    try {
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      } else {
+        alert("Delete failed.");
+      }
+    } catch (err) {
+      console.error("Delete error", err);
+    }
+  };
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("en-IN", {
@@ -135,6 +149,13 @@ export default function FilesPage() {
                   title="Download HTML"
                 >
                   <Download className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleDelete(p.id, p.title)}
+                  className="p-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-lg transition-all"
+                  title="Delete Project"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>

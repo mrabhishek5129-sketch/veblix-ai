@@ -10,6 +10,17 @@ export default function PWARegister() {
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
+    // Always register and update Service Worker to bust old caches
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          reg.update();
+          console.log("✅ SW updated & registered:", reg.scope);
+        })
+        .catch((err) => console.log("SW error:", err));
+    }
+
     // Check if already installed / running in standalone mode
     if (
       window.matchMedia("(display-mode: standalone)").matches ||
@@ -17,14 +28,6 @@ export default function PWARegister() {
     ) {
       setIsStandalone(true);
       return;
-    }
-
-    // Register Service Worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((reg) => console.log("✅ SW registered:", reg.scope))
-        .catch((err) => console.log("SW error:", err));
     }
 
     // PWA Install prompt listener (Android Chrome / Edge / Desktop)

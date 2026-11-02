@@ -59,17 +59,17 @@ export async function POST(req: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with 1,000 free bonus credits
+    // Create user with 100 free bonus credits (only given once on initial signup)
     const newUser = await prisma.user.create({
       data: {
         name: name || cleanEmail.split("@")[0],
         email: cleanEmail,
         mobile: cleanMobile || null,
         password: hashedPassword,
-        credits: 1000,
+        credits: 100,
         transactions: {
           create: {
-            amount: 1000,
+            amount: 100,
             type: "SIGNUP_BONUS",
           },
         },
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        message: "Account created successfully with 1,000 free credits!",
+        message: "Account created successfully with 100 free credits!",
         user: newUser,
       },
       { status: 201 }

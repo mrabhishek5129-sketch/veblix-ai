@@ -21,37 +21,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Process top-up transaction in DB
-    const [updatedUser, transaction] = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: {
-          credits: { increment: amountCredits },
-          transactions: {
-            create: {
-              amount: amountCredits,
-              type: "PURCHASE",
-            },
-          },
-        },
-        select: { credits: true },
-      }),
-      prisma.transaction.findFirst({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      message: `Successfully added ${amountCredits} credits to your account!`,
-      credits: updatedUser.credits,
-      transaction,
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { credits: true },
     });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Free credit additions are disabled. Free credits are only given once upon initial signup.
+    return NextResponse.json(
+      {
+        error:
+          "Online Payment Gateway jald shuru hoga. Free credits sirf naye account banane par ek hi baar milte hain.",
+      },
+      { status: 403 }
+    );
   } catch (error: any) {
     console.error("Billing error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to process purchase" },
+      { error: error.message || "Failed to process request" },
       { status: 500 }
     );
   }

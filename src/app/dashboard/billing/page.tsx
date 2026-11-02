@@ -62,31 +62,13 @@ export default function BillingPage() {
     },
   ];
 
-  const handlePurchase = async (pkg: typeof creditPackages[0]) => {
-    setPurchasingPlan(pkg.id);
-    try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planId: pkg.id,
-          amountCredits: pkg.credits,
-          priceInr: pkg.price,
-        }),
-      });
+  const [infoMsg, setInfoMsg] = useState("");
 
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setCredits(data.credits);
-        if (updateSession) updateSession({ credits: data.credits });
-        setSuccessMsg(`🎉 Successfully added +${pkg.credits} credits to your account!`);
-        setTimeout(() => setSuccessMsg(""), 4000);
-      }
-    } catch (err) {
-      console.error("Purchase error:", err);
-    } finally {
-      setPurchasingPlan(null);
-    }
+  const handlePurchase = (pkg: typeof creditPackages[0]) => {
+    setInfoMsg(
+      `⚠️ Online Payment Gateway (UPI / Card) jald live hoga! Free credits sirf naye account banane par ek hi baar milte hain.`
+    );
+    setTimeout(() => setInfoMsg(""), 6000);
   };
 
   return (
@@ -110,6 +92,13 @@ export default function BillingPage() {
           </div>
         </div>
       </div>
+
+      {infoMsg && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-semibold flex items-center space-x-2 animate-fadeIn">
+          <ShieldCheck className="w-5 h-5 flex-shrink-0 text-amber-400" />
+          <span>{infoMsg}</span>
+        </div>
+      )}
 
       {successMsg && (
         <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold flex items-center space-x-2 animate-fadeIn">
@@ -207,24 +196,14 @@ export default function BillingPage() {
 
               <button
                 onClick={() => handlePurchase(pkg)}
-                disabled={purchasingPlan === pkg.id}
                 className={`mt-8 w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-md ${
                   pkg.popular
                     ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/30"
-                    : "bg-gray-800 hover:bg-gray-700 text-white"
-                } disabled:opacity-60`}
+                    : "bg-gray-800 hover:bg-gray-700 text-gray-200"
+                }`}
               >
-                {purchasingPlan === pkg.id ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Top-Up {pkg.credits} Credits</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>Buy Pack (Payment Gateway Soon)</span>
               </button>
             </div>
           ))}

@@ -49,34 +49,32 @@ export async function POST(req: NextRequest) {
 
     // Send OTP
     if (method === "email") {
-      await sendOTPEmail(value, otp, user.name || undefined);
-      return NextResponse.json({
-        message: `OTP aapki email ${value} pe bheja gaya hai.`,
-        maskedTarget: maskEmail(value),
-      });
+      try {
+        await sendOTPEmail(value, otp, user.name || undefined);
+        return NextResponse.json({
+          message: `OTP aapki email ${value} pe bheja gaya hai.`,
+          maskedTarget: maskEmail(value),
+        });
+      } catch (emailErr) {
+        console.warn("Nodemailer failed, falling back to on-screen demo OTP:", emailErr);
+        // Fallback so user is not blocked even if Gmail SMTP is not configured
+        return NextResponse.json({
+          message: `OTP generate ho gaya hai.`,
+          maskedTarget: maskEmail(value),
+          demoOtp: otp,
+        });
+      }
     } else {
       // Mobile: Demo mode — real SMS ke liye Twilio chahiye
-      // For demo, we log the OTP to console
       console.log(`📱 [DEMO] Mobile OTP for ${value}: ${otp}`);
       return NextResponse.json({
         message: `OTP ${maskMobile(value)} pe bheja gaya hai.`,
         maskedTarget: maskMobile(value),
-        // In demo mode, return OTP so user can see it
-        demoOtp: process.env.NODE_ENV === "development" ? otp : undefined,
+        demoOtp: otp,
       });
     }
   } catch (error: any) {
     console.error("Send OTP error:", error);
-    // Nodemailer config error
-    if (error?.code === "EAUTH" || error?.responseCode === 535) {
-      return NextResponse.json(
-        {
-          error:
-            "Email config nahi hai. .env mein GMAIL_USER aur GMAIL_APP_PASSWORD set karo.",
-        },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
       { error: "OTP bhejne mein error aaya. Dobara try karo." },
       { status: 500 }

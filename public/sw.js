@@ -1,29 +1,24 @@
-const CACHE_NAME = "Veblix AI";
-const STATIC_CACHE = "static-v1";
+const CACHE_NAME = "veblix-ai-v4";
+const STATIC_CACHE = "static-v4";
 
+// Only cache pure static assets, NEVER dynamic auth or dashboard pages!
 const STATIC_ASSETS = [
-  "/",
-  "/dashboard",
-  "/login",
-  "/signup",
   "/manifest.json",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
+  "/icons/icon-192x192.svg",
+  "/icons/icon-512x512.svg",
 ];
 
 // Install: cache static assets
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch(() => {
-        // Ignore cache failures silently
-      });
+      return cache.addAll(STATIC_ASSETS).catch(() => {});
     })
   );
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: clean ALL old caches immediately
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -37,7 +32,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: network first, fallback to cache
+// Fetch: always network first for HTML and APIs
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
@@ -45,48 +40,26 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   if (url.pathname.startsWith("/api/")) return;
 
+  // Never cache dashboard or auth pages
+  if (
+    url.pathname.startsWith("/dashboard") ||
+    url.pathname.startsWith("/login") ||
+    url.pathname.startsWith("/signup") ||
+    url.pathname.startsWith("/builder")
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache successful responses
-        if (response.status === 200) {
+        if (response.status === 200 && url.pathname.startsWith("/icons/")) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, clone);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return response;
       })
-      .catch(() => {
-        // Fallback to cache when offline
-        return caches.match(event.request).then((cached) => {
-          if (cached) return cached;
-          // Offline fallback page
-          if (event.request.destination === "document") {
-            return caches.match("/") || new Response(
-              `<!DOCTYPE html>
-              <html lang="en">
-              <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-              <title>Veblix AI — Offline</title>
-              <style>
-                body{margin:0;background:#090a0f;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;}
-                .icon{font-size:64px;margin-bottom:16px;}
-                h1{font-size:24px;margin-bottom:8px;background:linear-gradient(135deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-                p{color:#9ca3af;font-size:14px;margin-bottom:24px;}
-                button{background:#7c3aed;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;cursor:pointer;}
-              </style></head>
-              <body>
-                <div>
-                  <div class="icon">✨</div>
-                  <h1>Veblix AI</h1>
-                  <p>Aap offline hain. Internet connect karo.</p>
-                  <button onclick="location.reload()">Retry karo</button>
-                </div>
-              </body></html>`,
-              { headers: { "Content-Type": "text/html" } }
-            );
-          }
-        });
-      })
+      .catch(() => caches.match(event.request))
   );
 });
